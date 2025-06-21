@@ -4,6 +4,9 @@ export { IntentFramework } from "./core/framework";
 // Export types
 export * from "./types";
 
+// Export extensions
+export * from "./extensions";
+
 // Export builders
 export { createIntent } from "./builders/intent";
 export { createFunction } from "./builders/function";

@@ -2,6 +2,7 @@ import {
   ChatCompletionMessageParam,
   ChatCompletionTool,
 } from "openai/resources/chat/completions";
+import { StorageExtension } from "../extensions";
 
 export type { ChatCompletionMessageParam, ChatCompletionTool };
 
@@ -80,7 +81,12 @@ export interface IntentFrameworkConfig {
     maxContexts?: number;
     ttl?: number;
   };
+  storageExtension: StorageExtensionConfig;
 }
+
+export type StorageExtensionConfig = {
+  instance: StorageExtension;
+} | null;
 
 export interface ExecutionContext {
   conversationId: string;

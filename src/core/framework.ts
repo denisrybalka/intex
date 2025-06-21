@@ -12,20 +12,26 @@ import {
 
 import { detectIntentByPattern, detectIntentByLLM } from "./detection";
 import { prepareFunctionTools, executeFunctionCalls } from "./execution";
+import { StorageManager } from "../extensions";
 
 export class IntentFramework {
   private openai: OpenAI;
   private config: IntentFrameworkConfig;
   private contracts: Map<string, IntentContract> = new Map();
-  private contextStore: Map<string, IntentContext[]> = new Map();
-  private conversationHistory: Map<string, ChatCompletionMessageParam[]> =
-    new Map();
+  private storageManager: StorageManager;
 
   constructor(config: IntentFrameworkConfig) {
     this.config = config;
     this.openai = new OpenAI({
       apiKey: config.openai.apiKey,
     });
+
+    this.storageManager = new StorageManager(
+      config.storageExtension,
+      this.log.bind(this)
+    );
+    // Initialize storage
+    this.storageManager.initialize();
   }
 
   registerContract(contract: IntentContract): void {
@@ -53,7 +59,8 @@ export class IntentFramework {
       userId,
       userMessage,
       functionCalls: [],
-      messages: this.getConversationHistory(conversationId),
+      messages:
+        await this.storageManager.getConversationHistory(conversationId),
     };
 
     try {
@@ -104,7 +111,6 @@ export class IntentFramework {
       if (contract.contextProvider && !executionContext.injectedContext) {
         try {
           executionContext.injectedContext = await contract.contextProvider();
-          this.storeContext(conversationId, executionContext.injectedContext);
         } catch (error) {
           this.log(
             "error",
@@ -153,7 +159,7 @@ export class IntentFramework {
         const finalMessage = finalResponse.choices[0].message;
         executionContext.messages.push(finalMessage);
 
-        this.updateConversationHistory(
+        await this.storageManager.updateConversationHistory(
           conversationId,
           executionContext.messages
         );
@@ -170,7 +176,7 @@ export class IntentFramework {
         };
       } else {
         executionContext.messages.push(response);
-        this.updateConversationHistory(
+        await this.storageManager.updateConversationHistory(
           conversationId,
           executionContext.messages
         );
@@ -274,36 +280,8 @@ export class IntentFramework {
     return response.choices[0].message;
   }
 
-  private storeContext(conversationId: string, context: IntentContext): void {
-    if (!this.config.contextRetention?.enabled) return;
-
-    const contexts = this.contextStore.get(conversationId) || [];
-    contexts.push(context);
-
-    const maxContexts = this.config.contextRetention.maxContexts || 10;
-    if (contexts.length > maxContexts) {
-      contexts.splice(0, contexts.length - maxContexts);
-    }
-
-    this.contextStore.set(conversationId, contexts);
-  }
-
-  private getConversationHistory(
-    conversationId: string
-  ): ChatCompletionMessageParam[] {
-    return this.conversationHistory.get(conversationId) || [];
-  }
-
-  private updateConversationHistory(
-    conversationId: string,
-    messages: ChatCompletionMessageParam[]
-  ): void {
-    this.conversationHistory.set(conversationId, [...messages]);
-  }
-
-  clearConversationHistory(conversationId: string): void {
-    this.conversationHistory.delete(conversationId);
-    this.contextStore.delete(conversationId);
+  async clearConversationHistory(conversationId: string): Promise<void> {
+    await this.storageManager.clearConversationHistory(conversationId);
   }
 
   private createFallbackResponse(
@@ -350,7 +328,6 @@ export class IntentFramework {
 
   async destroy(): Promise<void> {
     this.contracts.clear();
-    this.contextStore.clear();
-    this.conversationHistory.clear();
+    await this.storageManager.shutdown();
   }
 }
