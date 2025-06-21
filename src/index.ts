@@ -6,7 +6,7 @@ export * from "./types";
 
 // Export builders
 export { createIntent } from "./builders/intent";
-export { createFunction, createContextProvider } from "./builders/function";
+export { createFunction } from "./builders/function";
 
 // Export middleware
 export {
