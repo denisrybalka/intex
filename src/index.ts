@@ -19,9 +19,6 @@ export {
   createRateLimitMiddleware,
 } from "./middleware";
 
-// Export plugins
-export { Plugin, BasicAnalyticsPlugin, MemoryCachePlugin } from "./plugins";
-
 // Export utils
 export { validateContract } from "./utils/validation";
 export {

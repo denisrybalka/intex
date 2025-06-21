@@ -30,6 +30,7 @@ async function runWeatherBotExample() {
       enabled: true,
       maxContexts: 5,
     },
+    storageExtension: null,
   };
 
   // Create framework instance
