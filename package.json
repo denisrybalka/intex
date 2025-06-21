@@ -15,7 +15,10 @@
     "lint": "eslint src/**/*.ts",
     "format": "prettier --write src/**/*.ts",
     "docs": "typedoc src/index.ts",
-    "prepublishOnly": "npm run build && npm test"
+    "prepublishOnly": "npm run build && npm test",
+    "example:weather": "ts-node examples/basic/weather-bot.ts",
+    "example:math": "ts-node examples/basic/math-calculator.ts",
+    "example:multi": "ts-node examples/advanced/multi-intent.ts"
   },
   "keywords": [
     "openai",
@@ -35,6 +38,7 @@
     "url": "https://github.com/denisrybalka/intex.git"
   },
   "dependencies": {
+    "dotenv": "^16.5.0",
     "openai": "^5.6.0"
   },
   "devDependencies": {
