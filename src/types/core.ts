@@ -59,7 +59,7 @@ export interface IntentFrameworkConfig {
     maxTokens?: number;
   };
   intentDetection: {
-    strategy: "pattern" | "embedding" | "llm" | "hybrid";
+    strategy: "pattern" | "llm" | "hybrid";
     confidenceThreshold?: number;
   };
   logging?:
