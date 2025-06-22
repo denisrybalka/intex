@@ -16,7 +16,6 @@ async function main() {
     },
     logging: {
       enabled: false, // We'll use the plugin for logging instead
-      level: "info",
     },
     storageExtension: null,
   });

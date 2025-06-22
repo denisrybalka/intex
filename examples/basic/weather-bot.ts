@@ -20,15 +20,10 @@ async function runWeatherBotExample() {
     intentDetection: {
       strategy: "hybrid",
       confidenceThreshold: 0.6,
-      fallbackToLLM: true,
     },
     logging: {
       enabled: true,
       level: "info",
-    },
-    contextRetention: {
-      enabled: true,
-      maxContexts: 5,
     },
     storageExtension: null,
   };

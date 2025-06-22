@@ -30,13 +30,6 @@ export class IntentContractBuilder<TContext = any>
     return this;
   }
 
-  withFallback(
-    behavior: "reject" | "askUser" | "delegate"
-  ): IntentContractBuilder<TContext> {
-    this.contract.fallbackBehavior = behavior;
-    return this;
-  }
-
   build(): IntentContract<TContext> {
     if (!this.contract.intent || !this.contract.functions) {
       throw new Error("Contract must have intent and functions");

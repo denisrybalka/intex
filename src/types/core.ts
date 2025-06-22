@@ -42,7 +42,6 @@ export interface IntentContract<TContext = any, TFunctionParams = any> {
     | IntentContext<TContext>;
   functions: IntentFunction<TFunctionParams>[];
   middleware?: IntentMiddleware[];
-  fallbackBehavior?: "reject" | "askUser" | "delegate";
 }
 
 export interface IntentDetectionResult {
@@ -62,17 +61,15 @@ export interface IntentFrameworkConfig {
   intentDetection: {
     strategy: "pattern" | "embedding" | "llm" | "hybrid";
     confidenceThreshold?: number;
-    fallbackToLLM?: boolean;
   };
-  logging?: {
-    enabled: boolean;
-    level: "debug" | "info" | "warn" | "error";
-  };
-  contextRetention?: {
-    enabled: boolean;
-    maxContexts?: number;
-    ttl?: number;
-  };
+  logging?:
+    | {
+        enabled: false;
+      }
+    | {
+        enabled: true;
+        level: "debug" | "info" | "warn" | "error";
+      };
   storageExtension: StorageExtensionConfig;
 }
 

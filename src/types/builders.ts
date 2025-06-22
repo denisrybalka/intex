@@ -27,8 +27,5 @@ export interface IntentContractBuilderInterface<TContext = any> {
   withMiddleware(
     ...middleware: IntentMiddleware[]
   ): IntentContractBuilderInterface<TContext>;
-  withFallback(
-    behavior: "reject" | "askUser" | "delegate"
-  ): IntentContractBuilderInterface<TContext>;
   build(): IntentContract<TContext>;
 }
