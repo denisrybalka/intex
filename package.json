@@ -17,8 +17,7 @@
     "docs": "typedoc src/index.ts",
     "prepublishOnly": "npm run build && npm test",
     "example:weather": "ts-node examples/basic/weather-bot.ts",
-    "example:math": "ts-node examples/basic/math-calculator.ts",
-    "example:multi": "ts-node examples/advanced/multi-intent.ts"
+    "example:math": "ts-node examples/basic/math-calculator.ts"
   },
   "keywords": [
     "openai",

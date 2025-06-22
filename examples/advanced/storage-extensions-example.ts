@@ -1,13 +1,14 @@
 import { IntentFramework, createIntent, createFunction } from "../../src";
-import { RedisStorageExtension } from "../extensions/custom-storage-extension";
+import { InMemoryStorageExtension } from "../extensions/in-memory-storage-extension";
 
-// Create a custom storage extension
-const redisStorage = new RedisStorageExtension({
-  keyPrefix: "my-app:",
-  // Add your Redis configuration here
+// Create an in-memory storage extension
+const inMemoryStorage = new InMemoryStorageExtension({
+  id: "example-memory-store",
+  name: "Example Memory Storage",
+  description: "Simple memory storage for demonstration purposes",
 });
 
-// Initialize the framework with the storage extension
+// Initialize the framework with the in-memory storage extension
 const framework = new IntentFramework({
   openai: {
     apiKey: process.env.OPENAI_API_KEY || "",
@@ -21,28 +22,10 @@ const framework = new IntentFramework({
     enabled: true,
     level: "info",
   },
-  // Pass the storage extension to the framework
+  // Pass the in-memory storage extension to the framework
   storageExtension: {
-    instance: redisStorage,
+    instance: inMemoryStorage,
   },
-});
-
-// You can also create a truly stateless framework without any storage
-const statelessFramework = new IntentFramework({
-  openai: {
-    apiKey: process.env.OPENAI_API_KEY || "",
-    model: "gpt-4-turbo",
-  },
-  intentDetection: {
-    strategy: "hybrid",
-    confidenceThreshold: 0.7,
-  },
-  logging: {
-    enabled: true,
-    level: "info",
-  },
-  // Set storageExtension to null for a truly stateless framework
-  storageExtension: null,
 });
 
 // Create a simple weather intent
@@ -107,30 +90,89 @@ framework.registerContract({
   },
 });
 
-// Example usage
+// Example usage demonstrating the storage extension
 async function main() {
   const conversationId = "user-123";
 
   // Process a user message
+  console.log("Processing first message...");
   const response = await framework.process(
     "What is the weather like in Paris?",
     conversationId
   );
-
   console.log("Response:", response.response);
 
-  // Later in the conversation, process another message
+  // Check storage status after first message
+  console.log(
+    "Storage contains conversation:",
+    inMemoryStorage.hasConversation(conversationId)
+  );
+  console.log(
+    "Number of conversations in storage:",
+    inMemoryStorage.getStorageSize()
+  );
+
+  // Process a follow-up message that relies on conversation history
+  console.log("\nProcessing follow-up message...");
   const followUpResponse = await framework.process(
     "And how about in London?",
     conversationId
   );
-
   console.log("Follow-up response:", followUpResponse.response);
 
-  // When done with the conversation, you can clean it up
+  // Process another follow-up to demonstrate conversation memory
+  console.log("\nProcessing another follow-up...");
+  const anotherFollowUp = await framework.process(
+    "Is it colder there than in Paris?",
+    conversationId
+  );
+  console.log("Another follow-up response:", anotherFollowUp.response);
+
+  // Show all conversation IDs in storage
+  console.log(
+    "\nAll conversation IDs in storage:",
+    inMemoryStorage.getAllConversationIds()
+  );
+
+  // Clean up the specific conversation
+  console.log("\nClearing conversation history for", conversationId);
   await framework.clearConversationHistory(conversationId);
 
+  // Verify the conversation was removed
+  console.log(
+    "Storage still contains conversation:",
+    inMemoryStorage.hasConversation(conversationId)
+  );
+
+  // Create a second conversation to demonstrate multiple conversations
+  const secondConversationId = "user-456";
+  console.log(
+    "\nCreating a second conversation with ID:",
+    secondConversationId
+  );
+  const secondResponse = await framework.process(
+    "What's the weather like in Tokyo?",
+    secondConversationId
+  );
+  console.log("Second conversation response:", secondResponse.response);
+
+  // Show storage status with both conversations
+  console.log(
+    "Number of conversations in storage:",
+    inMemoryStorage.getStorageSize()
+  );
+  console.log("All conversation IDs:", inMemoryStorage.getAllConversationIds());
+
+  // Clear all conversations to demonstrate bulk operations
+  console.log("\nClearing all conversations from storage");
+  inMemoryStorage.clearAllConversations();
+  console.log(
+    "Number of conversations after clearing all:",
+    inMemoryStorage.getStorageSize()
+  );
+
   // When shutting down the application
+  console.log("\nShutting down framework and extensions...");
   await framework.destroy();
 }
 
