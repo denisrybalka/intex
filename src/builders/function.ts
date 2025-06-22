@@ -1,4 +1,4 @@
-import { IntentFunction } from "../types/core";
+import { IntentFunction } from "../types";
 
 export function createFunction<TParams = any, TReturn = any>(
   definition: Omit<IntentFunction<TParams, TReturn>, "id"> & { id?: string }

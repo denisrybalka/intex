@@ -3,8 +3,8 @@ import {
   ExecutionContext,
   FunctionCall,
   IntentFunction,
-} from "../types/core";
-import { PluginManager } from "../plugins/plugin-manager";
+} from "../types";
+import { PluginManager } from "../plugins";
 
 export function prepareFunctionTools(
   functions: IntentFunction[]

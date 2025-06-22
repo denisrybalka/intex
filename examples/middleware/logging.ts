@@ -1,5 +1,4 @@
-import { createMiddleware } from "./base";
-import { IntentMiddleware } from "../types/core";
+import { createMiddleware, IntentMiddleware } from "../../src";
 
 export function createLoggingMiddleware(): IntentMiddleware {
   return createMiddleware("logging", async (intent, userMessage, context) => {

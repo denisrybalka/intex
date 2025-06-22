@@ -8,13 +8,13 @@ import {
   IntentDetectionResult,
   IntentFrameworkConfig,
   IntentFrameworkResponse,
-} from "../types/core";
-import { Plugin } from "../types/plugins";
+  Plugin,
+} from "../types";
 
 import { detectIntentByPattern, detectIntentByLLM } from "./detection";
 import { prepareFunctionTools, executeFunctionCalls } from "./execution";
 import { StorageManager } from "../extensions";
-import { PluginManager } from "../plugins/plugin-manager";
+import { PluginManager } from "../plugins";
 
 export class IntentFramework {
   private openai: OpenAI;

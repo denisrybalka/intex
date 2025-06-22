@@ -1,1 +1,1 @@
-export { PluginManager } from "./plugin-manager";
+export * from "./plugin-manager";

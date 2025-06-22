@@ -1,8 +1,4 @@
-import {
-  IntentContract,
-  IntentFunction,
-  IntentMiddleware,
-} from "../types/core";
+import { IntentContract, IntentFunction, IntentMiddleware } from "../types";
 import { IntentContractBuilderInterface } from "../types/builders";
 
 export class IntentContractBuilder<TContext = any>

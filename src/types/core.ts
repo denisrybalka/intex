@@ -3,6 +3,7 @@ import {
   ChatCompletionTool,
 } from "openai/resources/chat/completions";
 import { StorageExtension } from "../extensions";
+import { IntentMiddleware } from "./middleware";
 
 export type { ChatCompletionMessageParam, ChatCompletionTool };
 
@@ -42,15 +43,6 @@ export interface IntentContract<TContext = any, TFunctionParams = any> {
   functions: IntentFunction<TFunctionParams>[];
   middleware?: IntentMiddleware[];
   fallbackBehavior?: "reject" | "askUser" | "delegate";
-}
-
-export interface IntentMiddleware {
-  id: string;
-  execute: (
-    intent: BaseIntent,
-    userMessage: string,
-    context?: IntentContext
-  ) => Promise<{ continue: boolean; modifiedContext?: IntentContext }>;
 }
 
 export interface IntentDetectionResult {
@@ -115,12 +107,4 @@ export interface IntentFrameworkResponse {
     totalExecutionTime: number;
     confidence?: number;
   };
-}
-
-export interface BasePlugin {
-  id: string;
-  name: string;
-  description: string;
-  initialize: () => Promise<void>;
-  shutdown: () => Promise<void>;
 }

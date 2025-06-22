@@ -12,12 +12,7 @@ export { createIntent } from "./builders/intent";
 export { createFunction } from "./builders/function";
 
 // Export middleware
-export {
-  createMiddleware,
-  createLoggingMiddleware,
-  createAuthMiddleware,
-  createRateLimitMiddleware,
-} from "./middleware";
+export { createMiddleware } from "./middleware";
 
 // Export utils
 export { validateContract } from "./utils/validation";

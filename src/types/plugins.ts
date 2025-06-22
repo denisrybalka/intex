@@ -1,4 +1,12 @@
-import { ExecutionContext, IntentFrameworkResponse, BasePlugin } from "./core";
+import { ExecutionContext, IntentFrameworkResponse } from "./core";
+
+export interface BasePlugin {
+  id: string;
+  name: string;
+  description: string;
+  initialize: () => Promise<void>;
+  shutdown: () => Promise<void>;
+}
 
 export interface Plugin extends BasePlugin {
   onBeforeIntentDetection?: (context: ExecutionContext) => Promise<void>;

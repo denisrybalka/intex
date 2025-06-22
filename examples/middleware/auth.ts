@@ -1,5 +1,4 @@
-import { createMiddleware } from "./base";
-import { IntentMiddleware } from "../types/core";
+import { createMiddleware, IntentMiddleware } from "../../src";
 
 export interface AuthOptions {
   validateToken: (token: string) => Promise<boolean> | boolean;

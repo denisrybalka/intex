@@ -1,6 +1,6 @@
 import { IntentFramework, createIntent, createFunction } from "../../src";
-import { LoggingPlugin } from "./plugins/logging-plugin";
-import { PerformancePlugin } from "./plugins/performance-plugin";
+import { LoggingPlugin } from "../plugins/logging-plugin";
+import { PerformancePlugin } from "../plugins/performance-plugin";
 
 // Example of using the plugin system with the framework
 async function main() {

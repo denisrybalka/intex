@@ -3,8 +3,8 @@ import {
   IntentContract,
   IntentContext,
   IntentFunction,
-  IntentMiddleware,
 } from "./core";
+import { IntentMiddleware } from "./middleware";
 
 export interface IntentBuilderInterface {
   withId(id: string): IntentBuilderInterface;

@@ -1,8 +1,4 @@
-import { Plugin } from "../../../src/types/plugins";
-import {
-  ExecutionContext,
-  IntentFrameworkResponse,
-} from "../../../src/types/core";
+import { ExecutionContext, IntentFrameworkResponse, Plugin } from "../../src";
 
 interface PerformanceMetric {
   name: string;

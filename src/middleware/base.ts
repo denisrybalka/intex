@@ -1,5 +1,4 @@
-import { BaseIntent, IntentContext, IntentMiddleware } from "../types/core";
-import { MiddlewareExecuteResult } from "../types/middleware";
+import { IntentMiddleware } from "../types";
 
 export function createMiddleware(
   id: string,

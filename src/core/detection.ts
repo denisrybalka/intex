@@ -3,7 +3,7 @@ import {
   BaseIntent,
   IntentDetectionResult,
   IntentFrameworkConfig,
-} from "../types/core";
+} from "../types";
 
 export async function detectIntentByPattern(
   userMessage: string,

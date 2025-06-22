@@ -2,10 +2,10 @@ import dotenv from "dotenv";
 import {
   createFunction,
   createIntent,
-  createLoggingMiddleware,
   IntentFramework,
   IntentFrameworkConfig,
 } from "../../src";
+import { createLoggingMiddleware } from "../middleware/logging";
 
 async function runWeatherBotExample() {
   console.log("🚀 Starting Weather Bot Example...\n");

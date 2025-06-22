@@ -1,5 +1,9 @@
-import { BaseIntent, IntentContext, IntentFunction } from "../types/core";
-import { IntentBuilderInterface } from "../types/builders";
+import {
+  BaseIntent,
+  IntentContext,
+  IntentFunction,
+  IntentBuilderInterface,
+} from "../types";
 import { IntentContractBuilder } from "./contract";
 
 export class IntentBuilder implements IntentBuilderInterface {
