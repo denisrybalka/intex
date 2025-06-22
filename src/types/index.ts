@@ -8,6 +8,3 @@ import * as PluginTypes from "./plugins";
 
 // Export without IntentMiddleware (already in core)
 export { MiddlewareExecuteResult } from "./middleware";
-
-// Export without BasePlugin (already in core)
-export { AnalyticsPlugin, CachePlugin } from "./plugins";

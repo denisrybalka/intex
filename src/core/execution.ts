@@ -4,6 +4,7 @@ import {
   FunctionCall,
   IntentFunction,
 } from "../types/core";
+import { PluginManager } from "../plugins/plugin-manager";
 
 export function prepareFunctionTools(
   functions: IntentFunction[]
@@ -24,6 +25,8 @@ export async function executeFunctionCalls(
   executionContext: ExecutionContext,
   logger: (level: "debug" | "info" | "warn" | "error", message: string) => void
 ): Promise<void> {
+  const pluginManager = PluginManager.getInstance();
+
   for (const toolCall of toolCalls) {
     const functionName = toolCall.function.name;
     const parameters = JSON.parse(toolCall.function.arguments);
@@ -39,6 +42,14 @@ export async function executeFunctionCalls(
       parameters,
     };
 
+    // Before function execution hook
+    await pluginManager.executeHook(
+      "onBeforeFunctionExecution",
+      executionContext,
+      func.id,
+      parameters
+    );
+
     const startTime = Date.now();
 
     try {
@@ -52,6 +63,14 @@ export async function executeFunctionCalls(
         "info",
         `Function ${functionName} executed successfully in ${functionCallRecord.executionTime}ms`
       );
+
+      // After function execution hook - success case
+      await pluginManager.executeHook(
+        "onAfterFunctionExecution",
+        executionContext,
+        func.id,
+        functionCallRecord.result
+      );
     } catch (error) {
       functionCallRecord.error =
         error instanceof Error ? error.message : String(error);
@@ -60,6 +79,15 @@ export async function executeFunctionCalls(
       logger(
         "error",
         `Function ${functionName} failed: ${functionCallRecord.error}`
+      );
+
+      // After function execution hook - error case
+      await pluginManager.executeHook(
+        "onAfterFunctionExecution",
+        executionContext,
+        func.id,
+        null,
+        functionCallRecord.error
       );
     }
 

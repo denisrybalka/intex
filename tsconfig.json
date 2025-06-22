@@ -10,6 +10,6 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "examples/plugins/logging-plugin.ts", "examples/plugins/performance-plugin.ts"],
   "exclude": ["node_modules", "dist", "examples", "tests"]
 }

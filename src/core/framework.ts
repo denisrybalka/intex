@@ -9,16 +9,19 @@ import {
   IntentFrameworkConfig,
   IntentFrameworkResponse,
 } from "../types/core";
+import { Plugin } from "../types/plugins";
 
 import { detectIntentByPattern, detectIntentByLLM } from "./detection";
 import { prepareFunctionTools, executeFunctionCalls } from "./execution";
 import { StorageManager } from "../extensions";
+import { PluginManager } from "../plugins/plugin-manager";
 
 export class IntentFramework {
   private openai: OpenAI;
   private config: IntentFrameworkConfig;
   private contracts: Map<string, IntentContract> = new Map();
   private storageManager: StorageManager;
+  private pluginManager: PluginManager;
 
   constructor(config: IntentFrameworkConfig) {
     this.config = config;
@@ -32,11 +35,19 @@ export class IntentFramework {
     );
     // Initialize storage
     this.storageManager.initialize();
+
+    // Get plugin manager instance
+    this.pluginManager = PluginManager.getInstance();
   }
 
   registerContract(contract: IntentContract): void {
     this.contracts.set(contract.intent.id, contract);
     this.log("info", `Registered intent contract: ${contract.intent.id}`);
+  }
+
+  registerPlugin(plugin: Plugin): void {
+    this.pluginManager.registerPlugin(plugin);
+    this.log("info", `Registered plugin: ${plugin.id}`);
   }
 
   registerContracts(contracts: IntentContract[]): void {
@@ -45,6 +56,19 @@ export class IntentFramework {
 
   getContracts(): IntentContract[] {
     return Array.from(this.contracts.values());
+  }
+
+  /**
+   * Shutdown the framework and all plugins
+   */
+  async shutdown(): Promise<void> {
+    // Shutdown all plugins
+    await this.pluginManager.shutdown();
+
+    // Shutdown storage manager
+    this.storageManager.shutdown();
+
+    this.log("info", "Framework shutdown complete");
   }
 
   async process(
@@ -69,9 +93,21 @@ export class IntentFramework {
         content: userMessage,
       });
 
+      // Before intent detection plugin hook
+      await this.pluginManager.executeHook(
+        "onBeforeIntentDetection",
+        executionContext
+      );
+
       // Detect intent
       const detectionResult = await this.detectIntent(userMessage);
       executionContext.detectedIntent = detectionResult ?? undefined;
+
+      // After intent detection plugin hook
+      await this.pluginManager.executeHook(
+        "onAfterIntentDetection",
+        executionContext
+      );
 
       if (!detectionResult) {
         return this.createFallbackResponse(executionContext, startTime);
@@ -107,6 +143,12 @@ export class IntentFramework {
         }
       }
 
+      // Before context injection plugin hook
+      await this.pluginManager.executeHook(
+        "onBeforeContextInjection",
+        executionContext
+      );
+
       // Provide context
       if (contract.contextProvider && !executionContext.injectedContext) {
         try {
@@ -119,26 +161,33 @@ export class IntentFramework {
         }
       }
 
+      // After context injection plugin hook
+      await this.pluginManager.executeHook(
+        "onAfterContextInjection",
+        executionContext
+      );
+
       // Prepare functions for OpenAI
       const tools = prepareFunctionTools(contract.functions);
 
       // Call OpenAI with function calling
-      const response = await this.callOpenAIWithFunctions(
+      const chatResponse = await this.callOpenAIWithFunctions(
         executionContext.messages,
         tools,
         detectionResult.intent
       );
 
       // Execute function calls if any
-      if (response.tool_calls && response.tool_calls.length > 0) {
+      if (chatResponse.tool_calls && chatResponse.tool_calls.length > 0) {
+        // Execute the functions with plugin hooks handled inside
         await executeFunctionCalls(
-          response.tool_calls,
+          chatResponse.tool_calls,
           contract.functions,
           executionContext,
           this.log.bind(this)
         );
 
-        executionContext.messages.push(response);
+        executionContext.messages.push(chatResponse);
 
         // Add function results to messages
         for (const functionCall of executionContext.functionCalls!) {
@@ -148,6 +197,12 @@ export class IntentFramework {
             content: JSON.stringify(functionCall.result || functionCall.error),
           });
         }
+
+        // Before response generation hook
+        await this.pluginManager.executeHook(
+          "onBeforeResponseGeneration",
+          executionContext
+        );
 
         // Get final response
         const finalResponse = await this.openai.chat.completions.create({
@@ -164,7 +219,7 @@ export class IntentFramework {
           executionContext.messages
         );
 
-        return {
+        const response = {
           response: finalMessage.content || "Function executed successfully.",
           executionContext,
           metadata: {
@@ -174,15 +229,32 @@ export class IntentFramework {
             confidence: detectionResult.confidence,
           },
         };
+
+        // After response generation hook
+        await this.pluginManager.executeHook(
+          "onAfterResponseGeneration",
+          executionContext,
+          response
+        );
+
+        return response;
       } else {
-        executionContext.messages.push(response);
+        // No tool calls, just a regular message
+        executionContext.messages.push(chatResponse);
+
+        // Before response generation hook
+        await this.pluginManager.executeHook(
+          "onBeforeResponseGeneration",
+          executionContext
+        );
+
         await this.storageManager.updateConversationHistory(
           conversationId,
           executionContext.messages
         );
 
-        return {
-          response: response.content || "No response generated.",
+        const response = {
+          response: chatResponse.content || "No response generated.",
           executionContext,
           metadata: {
             intentDetected: true,
@@ -191,9 +263,25 @@ export class IntentFramework {
             confidence: detectionResult.confidence,
           },
         };
+
+        // After response generation hook
+        await this.pluginManager.executeHook(
+          "onAfterResponseGeneration",
+          executionContext,
+          response
+        );
+
+        return response;
       }
     } catch (error) {
       this.log("error", `Error processing message: ${error}`);
+
+      // Call error hook for plugins
+      await this.pluginManager.executeHook(
+        "onError",
+        error as Error,
+        executionContext
+      );
 
       return {
         response:
