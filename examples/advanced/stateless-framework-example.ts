@@ -1,5 +1,5 @@
 import { IntentFramework, createIntent, createFunction } from "../../src";
-import { RedisStorageExtension } from "./custom-storage-extension";
+import { RedisStorageExtension } from "../extensions/custom-storage-extension";
 
 // Create a custom storage extension
 const redisStorage = new RedisStorageExtension({
