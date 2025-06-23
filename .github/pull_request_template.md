@@ -15,5 +15,8 @@
 <!-- Describe how the changes were tested -->
 
 ## Checklist
+- [ ] Code builds without errors (`npm run build`)
+- [ ] Tests pass locally (`npm test`)
+- [ ] Lint passes (`npm run lint`)
 - [ ] Documentation updated (if required)
 - [ ] New unit tests added for new functionality
