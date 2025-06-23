@@ -14,7 +14,7 @@ async function runWeatherBotExample() {
   const config: IntentFrameworkConfig = {
     openai: {
       apiKey: process.env.OPENAI_API_KEY || "your-openai-api-key-here",
-      model: "gpt-4",
+      model: "gpt-3.5-turbo",
       temperature: 0.7,
     },
     intentDetection: {

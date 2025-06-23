@@ -1,5 +1,8 @@
+import dotenv from "dotenv";
 import { IntentFramework, createIntent, createFunction } from "../../src";
 import { InMemoryStorageExtension } from "../extensions/in-memory-storage-extension";
+
+dotenv.config();
 
 // Create an in-memory storage extension
 const inMemoryStorage = new InMemoryStorageExtension({
@@ -11,8 +14,8 @@ const inMemoryStorage = new InMemoryStorageExtension({
 // Initialize the framework with the in-memory storage extension
 const framework = new IntentFramework({
   openai: {
-    apiKey: process.env.OPENAI_API_KEY || "",
-    model: "gpt-4-turbo",
+    apiKey: process.env.OPENAI_API_KEY || "your-openai-api-key-here",
+    model: "gpt-3.5-turbo",
   },
   intentDetection: {
     strategy: "hybrid",
@@ -134,6 +137,14 @@ async function main() {
     inMemoryStorage.getAllConversationIds()
   );
 
+  // Show all conversation history in storage
+  console.log(
+    "\nAll conversation IDs in storage:",
+    inMemoryStorage.getConversationHistory(
+      inMemoryStorage.getAllConversationIds()[0]
+    )
+  );
+
   // Clean up the specific conversation
   console.log("\nClearing conversation history for", conversationId);
   await framework.clearConversationHistory(conversationId);
@@ -177,6 +188,4 @@ async function main() {
 }
 
 // Run the example if this file is executed directly
-if (require.main === module) {
-  main().catch(console.error);
-}
+main().catch(console.error);

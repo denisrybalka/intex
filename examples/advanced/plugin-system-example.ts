@@ -1,13 +1,16 @@
+import dotenv from "dotenv";
 import { IntentFramework, createIntent, createFunction } from "../../src";
 import { LoggingPlugin } from "../plugins/logging-plugin";
 import { PerformancePlugin } from "../plugins/performance-plugin";
+
+dotenv.config();
 
 // Example of using the plugin system with the framework
 async function main() {
   // Create the framework with plugins
   const framework = new IntentFramework({
     openai: {
-      apiKey: process.env.OPENAI_API_KEY || "your-api-key",
+      apiKey: process.env.OPENAI_API_KEY || "your-openai-api-key-here",
       model: "gpt-3.5-turbo",
     },
     intentDetection: {

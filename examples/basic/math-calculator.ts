@@ -20,8 +20,8 @@ dotenv.config();
 // Initialize the framework
 const config: IntentFrameworkConfig = {
   openai: {
-    apiKey: process.env.OPENAI_API_KEY || "",
-    model: "gpt-4-turbo",
+    apiKey: process.env.OPENAI_API_KEY || "your-openai-api-key-here",
+    model: "gpt-3.5-turbo",
   },
   intentDetection: {
     strategy: "hybrid", // Use both pattern matching and AI
@@ -31,7 +31,7 @@ const config: IntentFrameworkConfig = {
     enabled: true,
     level: "info",
   },
-  storageExtension: null, // Use default in-memory storage
+  storageExtension: null,
 };
 
 const framework = new IntentFramework(config);
