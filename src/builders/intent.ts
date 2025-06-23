@@ -34,11 +34,6 @@ export class IntentBuilder implements IntentBuilderInterface {
     return this;
   }
 
-  withPriority(priority: number): IntentBuilder {
-    this.intent.priority = priority;
-    return this;
-  }
-
   withContext<T>(
     provider: () => Promise<IntentContext<T>> | IntentContext<T>
   ): IntentContractBuilder<T> {
@@ -69,7 +64,6 @@ export class IntentBuilder implements IntentBuilderInterface {
       id: this.intent.id,
       name: this.intent.name,
       description: this.intent.description,
-      priority: this.intent.priority || 0,
       patterns: this.intent.patterns || [],
       examples: this.intent.examples || [],
     };

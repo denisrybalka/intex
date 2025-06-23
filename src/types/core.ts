@@ -11,7 +11,6 @@ export interface BaseIntent {
   id: string;
   name: string;
   description: string;
-  priority?: number;
   patterns: string[];
   examples: string[];
 }

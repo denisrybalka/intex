@@ -12,7 +12,6 @@ export interface IntentBuilderInterface {
   withDescription(description: string): IntentBuilderInterface;
   withPatterns(...patterns: string[]): IntentBuilderInterface;
   withExamples(...examples: string[]): IntentBuilderInterface;
-  withPriority(priority: number): IntentBuilderInterface;
   withContext<T>(
     provider: () => Promise<IntentContext<T>> | IntentContext<T>
   ): IntentContractBuilderInterface<T>;
